@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanchar Roy // Developer Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0A0A0A;
+            color: #E0E0E0;
+            overflow-x: hidden;
+            cursor: none;
+        }
+        .aurora-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(ellipse at 70% 20%, rgba(251, 191, 36, 0.15), transparent 50%),
+                        radial-gradient(ellipse at 30% 80%, rgba(76, 107, 188, 0.15), transparent 50%);
+            animation: aurora 20s infinite linear;
+        }
+        @keyframes aurora { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        /* Custom Cursor */
+        .cursor-dot, .cursor-circle {
+            position: fixed;
+            top: 0; left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.2s ease-out, opacity 0.2s ease-out, width 0.2s ease-out, height 0.2s ease-out;
+        }
+        .cursor-dot {
+            width: 6px; height: 6px;
+            background-color: #FBBF24;
+        }
+        .cursor-circle {
+            width: 30px; height: 30px;
+            border: 2px solid #FBBF24;
+            opacity: 0.5;
+        }
+        .cursor-circle.hover {
+            transform: translate(-50%, -50%) scale(1.3);
+            opacity: 1;
+        }
+
+        #cursor-light {
+            position: fixed;
+            width: 800px; height: 800px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.08) 0%, rgba(251, 191, 36, 0) 60%);
+            pointer-events: none; z-index: 0; transform: translate(-50%, -50%);
+            transition: transform 0.1s ease-out, left 0.1s ease-out, top 0.1s ease-out;
+        }
+
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .section { scroll-margin-top: 60px; }
+        .nav-link { position: relative; transition: color 0.3s ease; padding-bottom: 8px; }
+        .nav-link::before {
+            content: ''; position: absolute; bottom: 0; left: 50%;
+            transform: translateX(-50%); width: 0; height: 2px;
+            background-color: #FBBF24; transition: width 0.3s ease-in-out;
+        }
+        .nav-link:hover, .nav-link.active { color: #FBBF24; }
+        .nav-link:hover::before, .nav-link.active::before { width: 60%; }
+
+        .animate-on-scroll { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .animate-on-scroll.is-visible { opacity: 1; transform: translateY(0); }
+        
+        .crystal-card {
+            background: rgba(18, 18, 18, 0.6); backdrop-filter: blur(12px);
+            border: 1px solid rgba(251, 191, 36, 0.1);
+            transition: transform 0.2s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+            transform-style: preserve-3d; position: relative; overflow: hidden;
+        }
+        .crystal-card:hover {
+            border-color: rgba(251, 191, 36, 0.7);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        }
+        .project-card { clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px)); }
+        
+        .crystal-card::after {
+            content: ''; position: absolute; top: 0; left: -150%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+        .crystal-card:hover::after { left: 150%; }
+
+        #particle-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
+        .hero-content { position: relative; z-index: 2; }
+        
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); } 40% { transform: translateX(-50%) translateY(-20px); } 60% { transform: translateX(-50%) translateY(-10px); } }
+
+        .timeline { position: relative; }
+        .timeline-line { position: absolute; left: -26px; top: 8px; bottom: 8px; width: 2px; background-color: #374151; transform-origin: top; transform: scaleY(0); transition: transform 1s ease-out; }
+        .timeline.is-visible .timeline-line { transform: scaleY(1); }
+        .timeline-item::before {
+            content: ''; position: absolute; top: 8px; left: -33px;
+            width: 14px; height: 14px; background-color: #121212;
+            border: 3px solid #FBBF24; border-radius: 50%; z-index: 1;
+        }
+        .social-icon:hover { transform: translateY(-4px); }
+        
+        /* Logo Animation */
+        .header-logo-container { perspective: 1000px; }
+        .logo-flipper { position: relative; width: 40px; height: 40px; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1); }
+        .header-logo-container:hover .logo-flipper { transform: rotateY(180deg); }
+        .logo-sr, .logo-bat {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            backface-visibility: hidden; -webkit-backface-visibility: hidden;
+        }
+        .logo-bat { transform: rotateY(180deg); }
+
+        .tech-icon { color: #6b7280; transition: color 0.3s ease; }
+        .crystal-card:hover .tech-icon { color: #FBBF24; }
+
+        /* Chatbot Styles */
+        #chat-widget {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+        }
+        #chat-bubble {
+            width: 60px; height: 60px;
+            background-color: #FBBF24;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4);
+            transition: transform 0.3s ease;
+        }
+        #chat-bubble:hover {
+            transform: scale(1.1);
+        }
+        #chat-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 350px;
+            height: 450px;
+            transform-origin: bottom right;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+        #chat-window.hidden {
+            transform: scale(0);
+            opacity: 0;
+        }
+    </style>
+</head>
+<body class="bg-black">
+    <div class="cursor-dot"></div>
+    <div class="cursor-circle"></div>
+    <div class="aurora-bg"></div>
+    <div id="cursor-light"></div>
+    <!-- Header & Navigation -->
+    <header id="header" class="bg-black/50 backdrop-blur-sm fixed w-full top-0 z-50 transition-all duration-300 border-b border-gray-800/50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-white font-orbitron flex items-center gap-4 header-logo-container">
+                <div class="logo-flipper">
+                    <svg class="h-10 w-10 logo-sr" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="48" fill="#FBBF24" stroke="#121212" stroke-width="4"/>
+                        <text x="50" y="68" font-family="Orbitron, sans-serif" font-size="50" font-weight="900" fill="#121212" text-anchor="middle">SR</text>
+                    </svg>
+                    <svg class="h-10 w-10 logo-bat" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                         <circle cx="12" cy="12" r="12" fill="#FBBF24"/>
+                         <path fill="#0A0A0A" d="M12.001 4.8c-3.2 0-5.2 1.6-6 3.2 2.8-1.2 5.2-1.2 6-1.2s3.2 0 6 1.2c-.8-1.6-2.8-3.2-6-3.2zm-7.2 4.8c-1.2 1.6-1.2 3.6 0 5.6 1.2 2 4.4 3.2 7.2 3.2s6-1.2 7.2-3.2c1.2-2 1.2-4 0-5.6-1.2-2-4.4-3.2-7.2-3.2s-6 1.2-7.2 3.2z"/>
+                    </svg>
+                </div>
+                <span class="tracking-wider">Sanchar Roy</span>
+            </a>
+             <div class="hidden md:flex space-x-10">
+                <a href="#home" class="nav-link text-gray-300 tracking-wide">Home</a>
+                <a href="#about" class="nav-link text-gray-300 tracking-wide">About</a>
+                <a href="#skills" class="nav-link text-gray-300 tracking-wide">Skills</a>
+                <a href="#projects" class="nav-link text-gray-300 tracking-wide">Projects</a>
+                <a href="#experience" class="nav-link text-gray-300 tracking-wide">Experience</a>
+                <a href="#education" class="nav-link text-gray-300 tracking-wide">Education</a>
+                <a href="#hobbies" class="nav-link text-gray-300 tracking-wide">Hobbies</a>
+                <a href="#contact" class="nav-link text-gray-300 tracking-wide">Contact</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden">
+                <i class="fas fa-bars text-2xl text-white"></i>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden bg-black/90 backdrop-blur-sm">
+            <a href="#home" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Home</a>
+            <a href="#about" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">About</a>
+            <a href="#skills" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Skills</a>
+            <a href="#projects" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Projects</a>
+            <a href="#experience" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Experience</a>
+            <a href="#education" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Education</a>
+            <a href="#hobbies" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Hobbies</a>
+            <a href="#contact" class="block py-3 px-6 text-sm text-gray-300 hover:bg-gray-800">Contact</a>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+
+        <!-- Home Section -->
+        <section id="home" class="section relative min-h-screen flex items-center">
+            <canvas id="particle-canvas"></canvas>
+            <div class="hero-content container mx-auto px-6 flex flex-col items-center text-center">
+                <h1 class="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400 leading-tight font-orbitron animate-on-scroll tracking-wider">SANCHAR ROY</h1>
+                <p class="mt-4 text-xl md:text-2xl text-amber-400 font-semibold animate-on-scroll tracking-widest" style="transition-delay: 200ms;">B.Tech CSE Student & Full-Stack Developer</p>
+                <p class="mt-8 text-lg max-w-3xl text-gray-300 animate-on-scroll leading-relaxed" style="transition-delay: 400ms;">Passionate about using technology to solve real-world problems. I aim to blend logic with creativity to grow as both a developer and a storyteller.</p>
+                <div class="mt-12 animate-on-scroll" style="transition-delay: 600ms;">
+                    <a href="SancharRoy_Resume.pdf" target="_blank" class="border-2 border-amber-400 text-amber-400 font-bold py-3 px-10 rounded-sm hover:bg-amber-400 hover:text-black transition duration-300 text-lg glow-on-hover tracking-wider">View Resume</a>
+                </div>
+            </div>
+            <a href="#about" class="scroll-down">
+                <i class="fas fa-chevron-down text-3xl"></i>
+            </a>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="section py-24">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-16 animate-on-scroll text-white font-orbitron tracking-widest">ABOUT ME</h2>
+                <div class="max-w-4xl mx-auto text-center animate-on-scroll">
+                    <div class="crystal-card p-10 rounded-lg tilt-element">
+                        <p class="text-gray-300 text-lg leading-relaxed mb-4">I'm a 21-year-old B.Tech CSE student at Regent Education and Research Foundation. With a strong command of Java and Python, I'm passionate about using tech to solve real-world problems. Outside of coding, I explore street photography, capturing candid moments and stories. My goal is to blend logic with creativity, growing as both a developer and a storyteller.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Skills & Languages Section -->
+        <section id="skills" class="section py-24">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-16 animate-on-scroll text-white font-orbitron tracking-widest">SKILLS & LANGUAGES</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    <div class="animate-on-scroll">
+                        <div class="crystal-card p-8 rounded-lg tilt-element h-full flex flex-col">
+                            <h3 class="text-2xl font-semibold mb-8 text-center text-amber-400 tracking-wider">TECHNICAL SKILLS</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 flex-grow">
+                                <div>
+                                    <h4 class="text-xl font-bold text-white mb-4">Languages</h4>
+                                    <ul class="text-gray-300 space-y-3">
+                                        <li class="flex items-center"><i class="fab fa-java text-amber-400 mr-3 text-xl"></i>Java</li>
+                                        <li class="flex items-center"><i class="fab fa-python text-amber-400 mr-3 text-xl"></i>Python</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h4 class="text-xl font-bold text-white mb-4">Development</h4>
+                                    <ul class="text-gray-300 space-y-3">
+                                        <li class="flex items-center"><i class="fas fa-code text-amber-400 mr-3 text-xl"></i>Full-Stack</li>
+                                        <li class="flex items-center"><i class="fas fa-desktop text-amber-400 mr-3 text-xl"></i>GUI (Tkinter)</li>
+                                        <li class="flex items-center"><i class="fas fa-pencil-ruler text-amber-400 mr-3 text-xl"></i>UI Design</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="animate-on-scroll" style="transition-delay: 200ms;">
+                        <div class="crystal-card p-8 rounded-lg tilt-element h-full">
+                             <h3 class="text-2xl font-semibold mb-8 text-center text-amber-400 tracking-wider">SPOKEN LANGUAGES</h3>
+                            <ul class="text-gray-300 space-y-4 text-lg">
+                                <li><strong class="font-semibold text-white">Bengali:</strong> <span class="text-amber-400 ml-2">Native</span></li>
+                                <li><strong class="font-semibold text-white">English:</strong> <span class="ml-2">Proficient</span></li>
+                                <li><strong class="font-semibold text-white">Hindi:</strong> <span class="ml-2">Proficient</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="section py-24">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-16 animate-on-scroll text-white font-orbitron tracking-widest">PROJECTS</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="animate-on-scroll">
+                        <div class="crystal-card project-card overflow-hidden group rounded-lg tilt-element">
+                            <img src="https://placehold.co/600x400/121212/FBBF24?text=Food+Delivery+UI" alt="Zomato Clone Project" class="w-full h-56 object-cover"><div class="p-6 flex flex-col"><h3 class="text-xl font-bold mb-2 text-white">Zomato Clone Platform</h3><p class="text-gray-400 mb-4 leading-relaxed flex-grow">A full-stack Zomato clone replicating core features for a seamless user and admin experience.</p><div class="flex justify-between items-center mt-auto"><div class="flex items-center gap-3"><i class="fab fa-java tech-icon text-xl" title="Java"></i><i class="fab fa-js-square tech-icon text-xl" title="JavaScript"></i></div><a href="https://github.com/sanchar02" target="_blank" class="text-2xl text-gray-500 hover:text-amber-400 transition-colors"><i class="fab fa-github"></i></a></div></div>
+                        </div>
+                    </div>
+                    <div class="animate-on-scroll" style="animation-delay: 1s;">
+                        <div class="crystal-card project-card overflow-hidden group rounded-lg tilt-element">
+                            <img src="https://placehold.co/600x400/121212/FBBF24?text=Hostel+Admin+Dashboard" alt="Hostel Management Project" class="w-full h-56 object-cover"><div class="p-6 flex flex-col"><h3 class="text-xl font-bold mb-2 text-white">Hostel Management System</h3><p class="text-gray-400 mb-4 leading-relaxed flex-grow">A responsive system for administrators to manage student records from admission to exit.</p><div class="flex justify-between items-center mt-auto"><div class="flex items-center gap-3"><i class="fab fa-html5 tech-icon text-xl" title="HTML5"></i><i class="fab fa-css3-alt tech-icon text-xl" title="CSS3"></i></div><a href="https://github.com/sanchar02" target="_blank" class="text-2xl text-gray-500 hover:text-amber-400 transition-colors"><i class="fab fa-github"></i></a></div></div>
+                        </div>
+                    </div>
+                    <div class="animate-on-scroll" style="animation-delay: 0.5s;">
+                         <div class="crystal-card project-card overflow-hidden group rounded-lg tilt-element">
+                            <img src="https://placehold.co/600x400/121212/FBBF24?text=Live+Location+Map" alt="Live Location Tracker Project" class="w-full h-56 object-cover"><div class="p-6 flex flex-col"><h3 class="text-xl font-bold mb-2 text-white">Real-Time Location Tracker</h3><p class="text-gray-400 mb-4 leading-relaxed flex-grow">A real-time web app to share and monitor location updates on an interactive map.</p><div class="flex justify-between items-center mt-auto"><div class="flex items-center gap-3"><i class="fas fa-map-marker-alt tech-icon text-xl" title="Mapping API"></i></div><a href="https://github.com/sanchar02" target="_blank" class="text-2xl text-gray-500 hover:text-amber-400 transition-colors"><i class="fab fa-github"></i></a></div></div>
+                        </div>
+                    </div>
+                    <div class="animate-on-scroll" style="animation-delay: 1.2s;">
+                         <div class="crystal-card project-card overflow-hidden group rounded-lg tilt-element">
+                            <img src="https://placehold.co/600x400/121212/FBBF24?text=Luffy+AI+Bot" alt="AI Discord Bot Project" class="w-full h-56 object-cover"><div class="p-6 flex flex-col"><h3 class="text-xl font-bold mb-2 text-white">Luffy: AI Discord Assistant</h3><p class="text-gray-400 mb-4 leading-relaxed flex-grow">A personal AI assistant for Discord, capable of answering queries and automating tasks using NLP.</p><div class="flex justify-between items-center mt-auto"><div class="flex items-center gap-3"><i class="fab fa-python tech-icon text-xl" title="Python"></i><i class="fas fa-robot tech-icon text-xl" title="OpenAI API"></i></div><a href="https://github.com/sanchar02/dicord-auto-reply-bot" target="_blank" class="text-2xl text-gray-500 hover:text-amber-400 transition-colors"><i class="fab fa-github"></i></a></div></div>
+                        </div>
+                    </div>
+                     <div class="animate-on-scroll" style="animation-delay: 0.8s;">
+                         <div class="crystal-card project-card overflow-hidden group rounded-lg tilt-element">
+                            <img src="https://placehold.co/600x400/121212/FBBF24?text=Number+Guessing+Game+UI" alt="Number Guessing Game Project" class="w-full h-56 object-cover"><div class="p-6 flex flex-col"><h3 class="text-xl font-bold mb-2 text-white">Python GUI Number Guesser</h3><p class="text-gray-400 mb-4 leading-relaxed flex-grow">An interactive game with animations and a clean UI, built using Python's Tkinter library.</p><div class="flex justify-between items-center mt-auto"><div class="flex items-center gap-3"><i class="fab fa-python tech-icon text-xl" title="Python"></i><i class="fas fa-desktop tech-icon text-xl" title="Tkinter"></i></div><a href="https://github.com/sanchar02/CODING-SAMURAI-INTERNSHIP-TASK" target="_blank" class="text-2xl text-gray-500 hover:text-amber-400 transition-colors"><i class="fab fa-github"></i></a></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section id="experience" class="section py-24">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-16 animate-on-scroll text-white font-orbitron tracking-widest">EXPERIENCE</h2>
+                <div class="max-w-3xl mx-auto animate-on-scroll">
+                    <div class="crystal-card p-10 rounded-lg tilt-element">
+                        <div class="flex flex-col sm:flex-row justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-2xl font-bold text-white">Intern, Python Programming</h3>
+                                <p class="text-lg font-semibold text-amber-400">Coding Samurai</p>
+                            </div>
+                            <p class="text-gray-400 mt-2 sm:mt-0">Aug 2025 - Sep 2025</p>
+                        </div>
+                        <ul class="list-disc list-inside text-gray-300 space-y-2 leading-relaxed">
+                            <li>Selected for the 'Python Programming' internship position in a dynamic and supportive environment.</li>
+                            <li>Tasked with completing projects with a proactive approach to problem-solving.</li>
+                            <li>Gained valuable experience and an opportunity to absorb knowledge and push boundaries.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Education Section -->
+        <section id="education" class="section py-24">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-16 animate-on-scroll text-white font-orbitron tracking-widest">EDUCATION</h2>
+                <div id="timeline-container" class="max-w-3xl mx-auto pl-8 timeline">
+                    <div class="timeline-line"></div>
+                    <div class="animate-on-scroll timeline-item relative"><p class="text-gray-400 text-sm mb-1">2008 - 2016</p><h3 class="text-xl font-bold text-white">Pre-Schooling</h3><p class="text-gray-300">Sofia Memorial School</p></div>
+                    <div class="animate-on-scroll timeline-item relative mt-12" style="transition-delay: 200ms;"><p class="text-gray-400 text-sm mb-1">2017 - 2020</p><h3 class="text-xl font-bold text-white">Secondary School</h3><p class="text-gray-300">Saint Andrew's High School</p></div>
+                    <div class="animate-on-scroll timeline-item relative mt-12" style="transition-delay: 400ms;"><p class="text-gray-400 text-sm mb-1">2020 - 2023</p><h3 class="text-xl font-bold text-white">Diploma</h3><p class="text-gray-300">Nalhati Government Polytechnic</p></div>
+                    <div class="animate-on-scroll timeline-item relative mt-12" style="transition-delay: 600ms;"><p class="text-gray-400 text-sm mb-1">2023 - 2026</p><h3 class="text-xl font-bold text-white">B.Tech, Computer Science & Engineering</h3><p class="text-gray-300">Regent Education and Research Foundation</p></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Hobbies Section -->
+        <section id="hobbies" class="section py-24">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-16 animate-on-scroll text-white font-orbitron tracking-widest">HOBBIES</h2>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-8 max-w-4xl mx-auto">
+                    <div class="text-center animate-on-scroll">
+                        <div class="crystal-card rounded-full w-32 h-32 flex items-center justify-center mx-auto mb-4 tilt-element">
+                            <i class="fas fa-camera-retro text-5xl text-amber-400"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white">Street Photography</h3>
+                    </div>
+                    <div class="text-center animate-on-scroll" style="transition-delay: 200ms;">
+                        <div class="crystal-card rounded-full w-32 h-32 flex items-center justify-center mx-auto mb-4 tilt-element">
+                            <i class="fas fa-film text-5xl text-amber-400"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white">Watching Movies</h3>
+                    </div>
+                    <div class="text-center animate-on-scroll" style="transition-delay: 400ms;">
+                        <div class="crystal-card rounded-full w-32 h-32 flex items-center justify-center mx-auto mb-4 tilt-element">
+                            <i class="fas fa-gamepad text-5xl text-amber-400"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white">Gaming</h3>
+                    </div>
+                    <div class="text-center animate-on-scroll" style="transition-delay: 600ms;">
+                        <div class="crystal-card rounded-full w-32 h-32 flex items-center justify-center mx-auto mb-4 tilt-element">
+                            <i class="fas fa-plane-departure text-5xl text-amber-400"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-white">Travelling</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="section py-24">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl font-bold text-center mb-16 animate-on-scroll text-white font-orbitron tracking-widest">GET IN TOUCH</h2>
+                <div class="max-w-2xl mx-auto animate-on-scroll">
+                    <div class="crystal-card p-10 rounded-lg tilt-element">
+                         <p class="text-center text-gray-400 mb-8 leading-relaxed">Have a question or want to work together? Leave your details and I'll get back to you as soon as possible.</p>
+                        <form id="contactForm">
+                            <div class="mb-5"><label for="name" class="block text-gray-300 font-semibold mb-2">Your Name</label><input type="text" id="name" name="name" class="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-700 rounded-md text-white focus:outline-none focus:border-amber-400 transition-colors" required></div>
+                            <div class="mb-5"><label for="email" class="block text-gray-300 font-semibold mb-2">Your Email</label><input type="email" id="email" name="email" class="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-700 rounded-md text-white focus:outline-none focus:border-amber-400 transition-colors" required></div>
+                            <div class="mb-6">
+                                <label for="message" class="block text-gray-300 font-semibold mb-2">Your Message</label>
+                                <textarea id="message" name="message" rows="5" class="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-700 rounded-md text-white focus:outline-none focus:border-amber-400 transition-colors" required></textarea>
+                            </div>
+                            <div class="flex justify-center">
+                                <button type="submit" id="send-message-btn" class="bg-amber-400 text-black font-bold py-3 px-8 rounded-sm hover:bg-amber-500 transition duration-300 w-full sm:w-auto glow-on-hover">
+                                    Send Message
+                                </button>
+                            </div>
+                        </form>
+                        <div id="form-message" class="text-center mt-6"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Chatbot Widget -->
+    <div id="chat-widget">
+        <div id="chat-window" class="hidden crystal-card rounded-lg flex flex-col">
+            <div class="bg-gray-800/50 p-4 rounded-t-lg border-b border-gray-700">
+                <h3 class="font-bold text-white text-lg text-center">AI Assistant</h3>
+            </div>
+            <div id="chat-messages" class="flex-grow p-4 overflow-y-auto">
+                <!-- Messages will be injected here -->
+            </div>
+            <div id="chat-typing-indicator" class="p-4 hidden">
+                <span class="text-gray-400 italic">AI is typing...</span>
+            </div>
+            <div class="p-4 border-t border-gray-700">
+                <form id="chat-form" class="flex gap-2">
+                    <input type="text" id="chat-input" class="w-full px-4 py-2 bg-gray-800/50 border-2 border-gray-700 rounded-md text-white focus:outline-none focus:border-amber-400 transition-colors" placeholder="Ask a question...">
+                    <button type="submit" class="bg-amber-400 text-black font-bold p-3 rounded-md hover:bg-amber-500 transition">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <button id="chat-bubble">
+            <i class="fas fa-comment-dots text-2xl text-black"></i>
+        </button>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-black py-10 border-t border-gray-800/50">
+        <div class="container mx-auto px-6 text-center text-gray-500">
+            <div class="flex justify-center space-x-6 mb-6">
+                <a href="https://www.linkedin.com/in/sanchar-roy-424601317" target="_blank" class="text-2xl hover:text-amber-400 transition-colors social-icon"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/sanchar02" target="_blank" class="text-2xl hover:text-amber-400 transition-colors social-icon"><i class="fab fa-github"></i></a>
+                <a href="https://www.reddit.com/user/Effective-Tale-6965/" target="_blank" class="text-2xl hover:text-amber-400 transition-colors social-icon"><i class="fab fa-reddit"></i></a>
+                <a href="https://www.instagram.com/san_pearl_white/?next=%2F" target="_blank" class="text-2xl hover:text-amber-400 transition-colors social-icon"><i class="fab fa-instagram"></i></a>
+            </div>
+            <p class="mb-3">sanchar.roy2020@gmail.com</p>
+            <p>&copy; 2025 Sanchar Roy. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const cursorDot = document.querySelector('.cursor-dot');
+            const cursorCircle = document.querySelector('.cursor-circle');
+            
+            document.addEventListener('mousemove', (e) => {
+                requestAnimationFrame(() => {
+                    cursorDot.style.left = `${e.clientX}px`;
+                    cursorDot.style.top = `${e.clientY}px`;
+                    cursorCircle.style.left = `${e.clientX}px`;
+                    cursorCircle.style.top = `${e.clientY}px`;
+                });
+            });
+
+            document.querySelectorAll('a, button, .tilt-element').forEach(el => {
+                el.addEventListener('mouseenter', () => cursorCircle.classList.add('hover'));
+                el.addEventListener('mouseleave', () => cursorCircle.classList.remove('hover'));
+            });
+
+            const cursorLight = document.getElementById('cursor-light');
+            document.addEventListener('mousemove', (e) => {
+                requestAnimationFrame(() => {
+                    cursorLight.style.left = `${e.clientX}px`;
+                    cursorLight.style.top = `${e.clientY}px`;
+                });
+            });
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
+            mobileMenu.querySelectorAll('a').forEach(link => link.addEventListener('click', () => mobileMenu.classList.add('hidden')));
+            
+            const contactForm = document.getElementById('contactForm');
+            const formMessage = document.getElementById('form-message');
+
+            contactForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                formMessage.textContent = "Message sent successfully!";
+                formMessage.className = 'text-green-400';
+                contactForm.reset();
+                setTimeout(() => formMessage.textContent = '', 5000);
+            });
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                         if (entry.target.id === 'timeline-container') {
+                            entry.target.querySelector('.timeline-line').style.transform = 'scaleY(1)';
+                        }
+                    } else {
+                        entry.target.classList.remove('is-visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+            observer.observe(document.getElementById('timeline-container'));
+
+
+            const sections = document.querySelectorAll('section.section');
+            const navLinks = document.querySelectorAll('header nav a.nav-link');
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    if (pageYOffset >= section.offsetTop - 70) { current = section.getAttribute('id'); }
+                });
+                navLinks.forEach(a => {
+                    a.classList.remove('active');
+                    if (a.getAttribute('href') === `#${current}`) { a.classList.add('active'); }
+                });
+            });
+
+            // --- Combined Float and Tilt Effect ---
+            const tiltElements = document.querySelectorAll('.tilt-element');
+            let animationFrameId;
+
+            const updateCardPositions = () => {
+                const time = Date.now() * 0.0005; // Slower speed
+                tiltElements.forEach((el, index) => {
+                    if (!el.isHovered) {
+                        const floatY = Math.sin(time + index) * 5; // Reduced float distance
+                        el.style.transform = `translateY(${floatY}px)`;
+                    }
+                });
+                animationFrameId = requestAnimationFrame(updateCardPositions);
+            };
+
+            tiltElements.forEach(el => {
+                el.isHovered = false;
+                el.addEventListener('mousemove', (e) => {
+                    el.isHovered = true;
+                    const { left, top, width, height } = el.getBoundingClientRect();
+                    const x = e.clientX - left;
+                    const y = e.clientY - top;
+                    const rotateX = (y - height / 2) / (height / 2) * -5;
+                    const rotateY = (x - width / 2) / (width / 2) * 5;
+                    el.style.transform = `perspective(1500px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+                });
+
+                el.addEventListener('mouseleave', () => {
+                    el.isHovered = false;
+                    // Smoothly transition back to floating
+                    el.style.transform = `perspective(1500px) rotateX(0) rotateY(0) scale3d(1, 1, 1)`;
+                });
+            });
+
+            // Start the floating animation
+            updateCardPositions();
+
+
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+            let mouse = { x: null, y: null };
+            
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = document.getElementById('home').offsetHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            canvas.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+            });
+            canvas.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+
+            class Particle {
+                constructor(x, y, size, color, speedX, speedY) {
+                    this.x = x; this.y = y; this.size = size; this.color = color;
+                    this.speedX = speedX; this.speedY = speedY;
+                    this.baseX = this.x; this.baseY = this.y;
+                    this.density = (Math.random() * 30) + 1;
+                }
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+                update() {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    let forceDirectionX = dx / distance;
+                    let forceDirectionY = dy / distance;
+                    let maxDistance = 100;
+                    let force = (maxDistance - distance) / maxDistance;
+                    let directionX = (forceDirectionX * force * this.density);
+                    let directionY = (forceDirectionY * force * this.density);
+
+                    if (distance < maxDistance) {
+                        this.x -= directionX;
+                        this.y -= directionY;
+                    } else {
+                        if (this.x !== this.baseX) { this.x -= (this.x - this.baseX) / 10; }
+                        if (this.y !== this.baseY) { this.y -= (this.y - this.baseY) / 10; }
+                    }
+                }
+            }
+
+            function init() {
+                particles = [];
+                let numberOfParticles = (canvas.height * canvas.width) / 20000; // Reduced density
+                for (let i = 0; i < numberOfParticles; i++) {
+                    let size = (Math.random() * 1.2) + 1;
+                    let x = (Math.random() * (innerWidth - size * 2) + size * 2);
+                    let y = (Math.random() * (innerHeight - size * 2) + size * 2);
+                    let speedX = (Math.random() * 0.2) - 0.1;
+                    let speedY = (Math.random() * 0.2) - 0.1;
+                    let color = 'rgba(251, 191, 36, 0.4)';
+                    particles.push(new Particle(x, y, size, color, speedX, speedY));
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, innerWidth, innerHeight);
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                }
+                connect();
+                requestAnimationFrame(animate);
+            }
+            
+            function connect() {
+                let opacityValue = 1;
+                for (let a = 0; a < particles.length; a++) {
+                    for (let b = a; b < particles.length; b++) {
+                        let distance = ((particles[a].x - particles[b].x) * (particles[a].x - particles[b].x))
+                                     + ((particles[a].y - particles[b].y) * (particles[a].y - particles[b].y));
+                        if (distance < (canvas.width / 12) * (canvas.height / 12)) {
+                            opacityValue = 1 - (distance / 20000);
+                            ctx.strokeStyle = `rgba(251, 191, 36, ${opacityValue * 0.3})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.beginPath();
+                            ctx.moveTo(particles[a].x, particles[a].y);
+                            ctx.lineTo(particles[b].x, particles[b].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+            
+            init();
+            animate();
+            
+            // --- Chatbot Logic ---
+            const chatBubble = document.getElementById('chat-bubble');
+            const chatWindow = document.getElementById('chat-window');
+            const chatForm = document.getElementById('chat-form');
+            const chatInput = document.getElementById('chat-input');
+            const chatMessages = document.getElementById('chat-messages');
+            const typingIndicator = document.getElementById('chat-typing-indicator');
+
+            let conversationHistory = [];
+
+            const systemInstruction = {
+                role: "system",
+                parts: [{ text: `You are Sanchar's friendly and professional AI assistant. Your purpose is to answer questions about Sanchar Roy based on his portfolio. Key information: He is a 21-year-old B.Tech CSE student specializing in Java and Python. His projects include a Zomato Clone, a Hostel Management System, a Live Location Tracker, an AI Discord Bot named Luffy, and a Python GUI Number Guesser. He interned at Coding Samurai. His hobbies are street photography, watching movies, gaming, and travelling. Keep your answers concise and helpful. If you don't know the answer, politely say you don't have that information.` }]
+            };
+
+            chatBubble.addEventListener('click', () => {
+                chatWindow.classList.toggle('hidden');
+                if (!chatWindow.classList.contains('hidden') && conversationHistory.length === 0) {
+                    addMessage('ai', 'Hello! How can I help you learn more about Sanchar?');
+                }
+            });
+
+            function addMessage(sender, text) {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('mb-3', 'p-3', 'rounded-lg', 'max-w-[80%]');
+                if (sender === 'user') {
+                    messageElement.classList.add('bg-amber-400', 'text-black', 'self-end', 'ml-auto');
+                } else {
+                    messageElement.classList.add('bg-gray-700', 'text-white', 'self-start');
+                }
+                messageElement.textContent = text;
+                chatMessages.appendChild(messageElement);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            const callChatApi = async () => {
+                typingIndicator.classList.remove('hidden');
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+                const payload = {
+                    contents: [systemInstruction.parts, ...conversationHistory],
+                };
+
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) throw new Error(`API Error: ${response.status}`);
+                    
+                    const result = await response.json();
+                    const aiResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (aiResponse) {
+                        addMessage('ai', aiResponse);
+                        conversationHistory.push({ role: "model", parts: [{ text: aiResponse }] });
+                    } else {
+                        addMessage('ai', "Sorry, I couldn't process that. Please try again.");
+                    }
+                } catch (error) {
+                    addMessage('ai', "Sorry, I'm having trouble connecting right now.");
+                } finally {
+                    typingIndicator.classList.add('hidden');
+                }
+            };
+            
+            chatForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const userInput = chatInput.value.trim();
+                if (!userInput) return;
+                
+                addMessage('user', userInput);
+                conversationHistory.push({ role: "user", parts: [{ text: userInput }] });
+                chatInput.value = '';
+
+                callChatApi();
+            });
+        });
+    </script>
+</body>
+</html>
+
